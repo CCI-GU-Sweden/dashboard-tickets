@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dashboard-tickets-helper-setup
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: helper-setup
+          image: REPLACE_WITH_REVIEWED_DASHBOARD_IMAGE_DIGEST
+          command: ["python", "manage.py", "setup_ticket_helpers", "--apply"]
+          env:
+            - name: DJANGO_SECRET_KEY
+              valueFrom: {secretKeyRef: {name: dashboard-runtime, key: secret-key}}
+            - name: PGHOST
+              valueFrom: {secretKeyRef: {name: ticket-helper-owner, key: host}}
+            - name: PGPORT
+              valueFrom: {secretKeyRef: {name: ticket-helper-owner, key: port}}
+            - name: PGDATABASE
+              valueFrom: {secretKeyRef: {name: ticket-helper-owner, key: database}}
+            - name: PGUSER
+              valueFrom: {secretKeyRef: {name: ticket-helper-owner, key: username}}
+            - name: PGPASSWORD
+              valueFrom: {secretKeyRef: {name: ticket-helper-owner, key: password}}
