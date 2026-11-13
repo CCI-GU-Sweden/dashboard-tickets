@@ -53,7 +53,7 @@ class TicketAdminEditForm(forms.Form):
 
 
 def admin_edit_ticket(ticket_id, form, user):
-    from accounts.models import TicketArchive
+    from .models import TicketArchive
     fields = ('reporter_name', 'reporter_identifier', 'microscope', 'message', 'ticket_type', 'resolution_note')
     data = form.cleaned_data
     with transaction.atomic():
@@ -127,7 +127,8 @@ def add_images(cursor, ticket_id, images):
 
 
 def update_ticket(ticket_id, form, user, images=None):
-    from accounts.models import TicketArchive, TicketStaffAssignment, User
+    from accounts.models import User
+    from .models import TicketArchive, TicketStaffAssignment
     images = images or []
     data = form.cleaned_data
     if not 1 <= ticket_id <= 9223372036854775807:
@@ -212,7 +213,8 @@ def update_ticket(ticket_id, form, user, images=None):
 
 
 def create_ticket(form, user, images=None):
-    from accounts.models import AuditEvent, TicketResearcherLink, TicketTag, TicketTagAssignment, User
+    from accounts.models import AuditEvent, User
+    from .models import TicketResearcherLink, TicketTag, TicketTagAssignment
     images = images or []
     values = form.cleaned_data
     actor = f'dashboard-user:{user.pk}'
@@ -418,7 +420,7 @@ def list_tickets(params, researcher_id=None):
         count = cursor.fetchone()[0]
         cursor.execute('SELECT ticket_id, reporter_name, microscope, message, status, priority, opened_at, ticket_type, issue_type, assigned_to, resolved_at, updated_at, source, (SELECT count(*) FROM public.microscope_ticket_image i WHERE i.ticket_id = public.microscope_ticket.ticket_id) FROM public.microscope_ticket' + where + ' ORDER BY ' + sorts[sort] + ' ' + order.upper() + ' NULLS LAST, ticket_id DESC LIMIT %s OFFSET %s', values + [size, (page - 1) * size])
         rows = cursor.fetchall()
-    from accounts.models import TicketStaffAssignment, TicketTagAssignment
+    from .models import TicketStaffAssignment, TicketTagAssignment
     assignments = {}
     for item in TicketStaffAssignment.objects.filter(ticket_id__in=[row[0] for row in rows]).select_related('staff'):
         assignments.setdefault(item.ticket_id, []).append({'id': str(item.staff_id), 'name': item.staff.get_full_name() or item.staff.username})
@@ -494,7 +496,8 @@ def read_researcher_ticket(ticket_id, researcher_id):
 
 
 def read_ticket(ticket_id, all_events=False):
-    from accounts.models import TicketStaffAssignment, User
+    from accounts.models import User
+    from .models import TicketStaffAssignment
     if not 1 <= ticket_id <= 9223372036854775807:
         return None
     with connection.cursor() as cursor:

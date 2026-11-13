@@ -4,7 +4,8 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbid
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 
-from accounts.models import AuditEvent, TicketArchive, TicketResearcherLink, TicketStaffAssignment, TicketTag, TicketTagAssignment, User
+from accounts.models import AuditEvent, User
+from .models import TicketArchive, TicketResearcherLink, TicketStaffAssignment, TicketTag, TicketTagAssignment
 from accounts.permissions import is_dashboard_admin, operational_access, researcher_access
 
 
