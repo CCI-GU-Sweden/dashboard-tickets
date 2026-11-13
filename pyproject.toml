@@ -12,3 +12,6 @@ license = "MIT"
 
 [tool.setuptools.packages.find]
 include = ["dashboard_tickets*"]
+
+[tool.setuptools.package-data]
+dashboard_tickets = ["templates/*.html", "static/js/*.js"]
